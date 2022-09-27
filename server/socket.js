@@ -4,17 +4,18 @@ const path = require('path')
 const http = require('http')
 const cors = require('cors')
 const { Server } = require('socket.io')
-const port = process.env.PORT || 3001
+
 app.use(cors())
-app.use(express.static(path.join(__dirname + '/public')))
+app.use(express.json())
+app.use(express.static(path.join(__dirname, 'public')))
+
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve('server/public/index.html'))
+})
+
 const server = http.createServer(app)
 
-const io = new Server(server, {
-  cors: {
-    origin: 'http://localhost:3000', //
-    method: ['GET', 'POST'],
-  },
-})
+const io = new Server(server)
 
 //listening to events on the server in the client side
 io.on('connection', (socket) => {
@@ -33,6 +34,4 @@ io.on('connection', (socket) => {
   })
 })
 
-server.listen(port, () => {
-  console.log('listening to port')
-})
+module.exports = server
